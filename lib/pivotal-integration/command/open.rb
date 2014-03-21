@@ -13,8 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git_pivotal_tracker_integration'
+require_relative 'base'
+require 'pivotal-tracker'
+require 'launchy'
 
-# A module encapsulating version update implementations
-module GitPivotalTrackerIntegration::VersionUpdate
+# The class that encapsulates assigning current Pivotal Tracker Story to a user
+class PivotalIntegration::Command::Open < PivotalIntegration::Command::Base
+  desc "Open the current story or project in a web browser."
+
+  def run(*arguments)
+    if arguments.first.try(:downcase) == 'project'
+      Launchy.open "https://www.pivotaltracker.com/s/projects/#{story.project_id}"
+    else
+      Launchy.open story.url
+    end
+  end
 end

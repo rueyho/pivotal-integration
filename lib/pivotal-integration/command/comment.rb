@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby -U
 # Git Pivotal Tracker Integration
 # Copyright (c) 2013 the original author or authors.
 #
@@ -14,6 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git-pivotal-tracker-integration/command/finish'
+require_relative 'base'
+require 'pivotal-tracker'
 
-GitPivotalTrackerIntegration::Command::Finish.new().run ARGV[0]
+# The class that encapsulates assigning current Pivotal Tracker Story to a user
+class PivotalIntegration::Command::Comment < PivotalIntegration::Command::Base
+  desc "Add a comment to the current story"
+
+  def run(*arguments)
+    comment = arguments.first
+    abort "A comment must be provided." unless comment
+
+    print "Adding comment to story ##{story.id}... "
+    PivotalIntegration::Util::Story.add_comment(story, comment)
+    puts 'OK'
+  end
+end

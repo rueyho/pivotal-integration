@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 # Git Pivotal Tracker Integration
 # Copyright (c) 2013 the original author or authors.
 #
@@ -14,13 +13,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-CURRENT_BRANCH=$(git branch | grep "*" | sed "s/* //")
-STORY_ID=$(git config branch.$CURRENT_BRANCH.pivotal-story-id)
+require_relative 'util'
 
-if [[ $2 != "commit" && -n $STORY_ID ]]; then
-	ORIG_MSG_FILE="$1"
-	TEMP=$(mktemp /tmp/git-XXXXX)
+# Utilities for dealing with the shell
+class PivotalIntegration::Util::Shell
 
-	(printf "\n\n[#$STORY_ID]" ; cat "$1") > "$TEMP"
-	cat "$TEMP" > "$ORIG_MSG_FILE"
-fi
+  # Executes a command
+  #
+  # @param [String] command the command to execute
+  # @param [Boolean] abort_on_failure whether to +Kernel#abort+ with +FAIL+ as
+  #   the message when the command's +Status#existstatus+ is not +0+
+  # @return [String] the result of the command
+  def self.exec(command, abort_on_failure = true)
+    result = `#{command}`
+    if $?.exitstatus != 0 && abort_on_failure
+      abort 'FAIL'
+    end
+
+    result
+  end
+
+end

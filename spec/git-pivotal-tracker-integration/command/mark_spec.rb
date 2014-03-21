@@ -15,31 +15,35 @@
 
 require 'spec_helper'
 require 'git-pivotal-tracker-integration/command/configuration'
-require 'git-pivotal-tracker-integration/command/finish'
+require 'git-pivotal-tracker-integration/command/mark'
 require 'git-pivotal-tracker-integration/util/git'
 require 'pivotal-tracker'
 
-describe PivotalIntegration::Command::Finish do
+describe PivotalIntegration::Command::Mark do
 
   before do
     $stdout = StringIO.new
     $stderr = StringIO.new
 
     @project = double('project')
+    @story = double('story')
     PivotalIntegration::Util::Git.should_receive(:repository_root)
     PivotalIntegration::Command::Configuration.any_instance.should_receive(:api_token)
     PivotalIntegration::Command::Configuration.any_instance.should_receive(:project_id)
     PivotalTracker::Project.should_receive(:find).and_return(@project)
-    @finish = PivotalIntegration::Command::Finish.new
+    @mark = PivotalIntegration::Command::Mark.new
   end
 
   it 'should run' do
-    PivotalIntegration::Util::Git.should_receive(:trivial_merge?)
-    PivotalIntegration::Command::Configuration.any_instance.should_receive(:story)
-    PivotalIntegration::Util::Git.should_receive(:merge)
-    PivotalIntegration::Util::Git.should_receive(:branch_name).and_return('master')
-    PivotalIntegration::Util::Git.should_receive(:push).with('master')
+    PivotalIntegration::Command::Configuration.any_instance.should_receive(:story).and_return(@story)
 
-    @finish.run nil
+    menu = double('menu')
+    menu.should_receive(:prompt=)
+    PivotalIntegration::Command::Mark::STATES.each { |state| menu.should_receive(:choice).with(state) }
+    @mark.should_receive(:choose) { |&arg| arg.call menu }.and_return('finished')
+
+    PivotalIntegration::Util::Story.should_receive(:mark).with(@story, 'finished')
+
+    @mark.run(nil)
   end
 end

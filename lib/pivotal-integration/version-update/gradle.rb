@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git-pivotal-tracker-integration/version-update/version_update'
+require_relative 'version_update'
 
 # A version updater for dealing with _typical_ Gradle projects.  This updater
 # assumes that the version of the current project is stored within a
 # +gradle.properties+ file in the root of the repository.  This properties
 # file should have an entry with a key of +version+ and version number as the key.
-class GitPivotalTrackerIntegration::VersionUpdate::Gradle
+class PivotalIntegration::VersionUpdate::Gradle
 
   # Creates an instance of this updater
   #

@@ -13,8 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git_pivotal_tracker_integration'
+require_relative 'base'
+require_relative '../util/label'
+require 'pivotal-tracker'
 
-# A module encapsulating utilities for the project
-module GitPivotalTrackerIntegration::Util
+MODES = %w(add remove list once)
+
+# The class that encapsulates starting a Pivotal Tracker Story
+class PivotalIntegration::Command::Label < PivotalIntegration::Command::Base
+  desc "Manage labels for the current story"
+
+  # Adds labels for active story.
+  # @return [void]
+  def run(mode, *labels)
+    abort "You need to specify mode first [#{MODES}], e.g. 'git label add to_qa'" unless MODES.include? mode
+
+    PivotalIntegration::Util::Label.send(mode, story, *labels)
+  end
 end

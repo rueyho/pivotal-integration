@@ -13,24 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git-pivotal-tracker-integration/command/command'
-require 'git-pivotal-tracker-integration/command/configuration'
-require 'git-pivotal-tracker-integration/util/git'
+require_relative 'command'
+require_relative 'configuration'
+require_relative '../util/git'
+require_relative '../util/story'
 require 'pivotal-tracker'
 
 # An abstract base class for all commands
 # @abstract Subclass and override {#run} to implement command functionality
-class GitPivotalTrackerIntegration::Command::Base
-
+class PivotalIntegration::Command::Base
   # Common initialization functionality for all command classes.  This
   # enforces that:
   # * the command is being run within a valid Git repository
   # * the user has specified their Pivotal Tracker API token
   # * all communication with Pivotal Tracker will be protected with SSL
   # * the user has configured the project id for this repository
-  def initialize
-    @repository_root = GitPivotalTrackerIntegration::Util::Git.repository_root
-    @configuration = GitPivotalTrackerIntegration::Command::Configuration.new
+  def initialize(options = {})
+    @options = options
+    @repository_root = PivotalIntegration::Util::Git.repository_root
+    @configuration = PivotalIntegration::Command::Configuration.new
 
     PivotalTracker::Client.token = @configuration.api_token
     PivotalTracker::Client.use_ssl = true
@@ -40,8 +41,23 @@ class GitPivotalTrackerIntegration::Command::Base
 
   # The main entry point to the command's execution
   # @abstract Override this method to implement command functionality
-  def run
+  def run(*arguments)
     raise NotImplementedError
   end
 
+  def story
+    if @options[:story_id]
+      @configuration.project.stories.find(@options[:story_id])
+    else
+      @configuration.story
+    end
+  end
+
+  class << self
+    attr_reader :description
+
+    def desc(text)
+      @description = text
+    end
+  end
 end

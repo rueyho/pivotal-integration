@@ -5,21 +5,21 @@
 [![Code Climate](https://codeclimate.com/github/nebhale/git-pivotal-tracker-integration.png)](https://codeclimate.com/github/nebhale/git-pivotal-tracker-integration)
 
 
-`git-pivotal-tracker-integration` provides a set of additional Git commands to help developers when working with [Pivotal Tracker][pivotal-tracker].
+`pivotal-integration` provides a set of additional Git commands to help developers when working with [Pivotal Tracker][pivotal-tracker].
 
 [pivotal-tracker]: http://www.pivotaltracker.com
 
 
 ## Installation
-`git-pivotal-tracker-integration` requires at least **Ruby 1.8.7** and **Git 1.8.2.1** in order to run.  It is tested against Rubies _1.8.7_, _1.9.3_, and _2.0.0_.  In order to install it, do the following:
+`pivotal-integration` requires at least **Ruby 1.8.7** and **Git 1.8.2.1** in order to run.  It is tested against Rubies _1.8.7_, _1.9.3_, and _2.0.0_.  In order to install it, do the following:
 
 ```plain
-$ gem install git-pivotal-tracker-integration
+$ gem install pivotal-integration
 ```
 
 
 ## Usage
-`git-pivotal-tracker-integration` is intended to be a very lightweight tool, meaning that it won't affect your day to day workflow very much.  To be more specific, it is intended to automate branch creation and destruction as well as story state changes, but will not affect when you commit, when development branches are pushed to origin, etc.  The typical workflow looks something like the following:
+`pivotal-integration` is intended to be a very lightweight tool, meaning that it won't affect your day to day workflow very much.  To be more specific, it is intended to automate branch creation and destruction as well as story state changes, but will not affect when you commit, when development branches are pushed to origin, etc.  The typical workflow looks something like the following:
 
 ```plain
 $ git start       # Creates branch and starts story
@@ -33,7 +33,7 @@ $ git finish      # Merges and destroys branch, pushes to origin, and finishes s
 ## Configuration
 
 ### Git Client
-In order to use `git-pivotal-tracker-integration`, two Git client configuration properties must be set.  If these properties have not been set, you will be prompted for them and your Git configuration will be updated.
+In order to use `pivotal-integration`, two Git client configuration properties must be set.  If these properties have not been set, you will be prompted for them and your Git configuration will be updated.
 
 | Name | Description
 | ---- | -----------

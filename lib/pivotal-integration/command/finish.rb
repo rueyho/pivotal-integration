@@ -13,12 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git-pivotal-tracker-integration/command/base'
-require 'git-pivotal-tracker-integration/command/command'
-require 'git-pivotal-tracker-integration/util/git'
+require_relative 'base'
 
 # The class that encapsulates finishing a Pivotal Tracker Story
-class GitPivotalTrackerIntegration::Command::Finish < GitPivotalTrackerIntegration::Command::Base
+class PivotalIntegration::Command::Finish < PivotalIntegration::Command::Base
+  desc "Finish working on a story"
 
   # Finishes a Pivotal Tracker story by doing the following steps:
   # * Check that the pending merge will be trivial
@@ -27,12 +26,25 @@ class GitPivotalTrackerIntegration::Command::Finish < GitPivotalTrackerIntegrati
   # * Push changes to remote
   #
   # @return [void]
-  def run(argument)
-    no_complete = argument =~ /--no-complete/
+  def run(*arguments)
+    no_complete = arguments.delete('--no-complete')
+    no_delete = arguments.delete('--no-delete')
+    no_merge = arguments.delete('--no-merge')
+    pull_request = arguments.delete('--pull-request') || PivotalIntegration::Util::Git.finish_mode == :pull_request
 
-    GitPivotalTrackerIntegration::Util::Git.trivial_merge?
-    GitPivotalTrackerIntegration::Util::Git.merge(@configuration.story(@project), no_complete)
-    GitPivotalTrackerIntegration::Util::Git.push GitPivotalTrackerIntegration::Util::Git.branch_name
+    if pull_request
+      PivotalIntegration::Util::Git.push PivotalIntegration::Util::Git.branch_name
+      PivotalIntegration::Util::Git.create_pull_request(@configuration.story)
+      PivotalIntegration::Util::Story.mark(@configuration.story, :finished)
+      return
+    end
+
+    unless no_merge
+      PivotalIntegration::Util::Git.trivial_merge?
+      PivotalIntegration::Util::Git.merge(@configuration.story, no_complete, no_delete)
+    end
+
+    PivotalIntegration::Util::Git.push PivotalIntegration::Util::Git.branch_name
   end
 
 end

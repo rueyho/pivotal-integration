@@ -15,31 +15,30 @@
 
 require 'spec_helper'
 require 'git-pivotal-tracker-integration/command/configuration'
-require 'git-pivotal-tracker-integration/command/finish'
+require 'git-pivotal-tracker-integration/command/label'
 require 'git-pivotal-tracker-integration/util/git'
 require 'pivotal-tracker'
 
-describe PivotalIntegration::Command::Finish do
+describe PivotalIntegration::Command::Label do
 
   before do
     $stdout = StringIO.new
     $stderr = StringIO.new
 
     @project = double('project')
+    @story = double('story')
     PivotalIntegration::Util::Git.should_receive(:repository_root)
     PivotalIntegration::Command::Configuration.any_instance.should_receive(:api_token)
     PivotalIntegration::Command::Configuration.any_instance.should_receive(:project_id)
     PivotalTracker::Project.should_receive(:find).and_return(@project)
-    @finish = PivotalIntegration::Command::Finish.new
+    @label = PivotalIntegration::Command::Label.new
   end
 
   it 'should run' do
-    PivotalIntegration::Util::Git.should_receive(:trivial_merge?)
-    PivotalIntegration::Command::Configuration.any_instance.should_receive(:story)
-    PivotalIntegration::Util::Git.should_receive(:merge)
-    PivotalIntegration::Util::Git.should_receive(:branch_name).and_return('master')
-    PivotalIntegration::Util::Git.should_receive(:push).with('master')
+    PivotalIntegration::Command::Configuration.any_instance.should_receive(:story).and_return(@story)
 
-    @finish.run nil
+    PivotalIntegration::Util::Label.should_receive(:send).with('add', @story, 'on_qa')
+
+    @label.run('add', 'on_qa')
   end
 end

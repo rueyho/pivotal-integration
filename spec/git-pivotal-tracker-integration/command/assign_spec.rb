@@ -15,31 +15,41 @@
 
 require 'spec_helper'
 require 'git-pivotal-tracker-integration/command/configuration'
-require 'git-pivotal-tracker-integration/command/finish'
+require 'git-pivotal-tracker-integration/command/assign'
 require 'git-pivotal-tracker-integration/util/git'
 require 'pivotal-tracker'
 
-describe PivotalIntegration::Command::Finish do
+describe PivotalIntegration::Command::Assign do
 
   before do
     $stdout = StringIO.new
     $stderr = StringIO.new
 
     @project = double('project')
+    @story = double('story')
     PivotalIntegration::Util::Git.should_receive(:repository_root)
     PivotalIntegration::Command::Configuration.any_instance.should_receive(:api_token)
     PivotalIntegration::Command::Configuration.any_instance.should_receive(:project_id)
     PivotalTracker::Project.should_receive(:find).and_return(@project)
-    @finish = PivotalIntegration::Command::Finish.new
+    @assign = PivotalIntegration::Command::Assign.new
   end
 
   it 'should run' do
-    PivotalIntegration::Util::Git.should_receive(:trivial_merge?)
-    PivotalIntegration::Command::Configuration.any_instance.should_receive(:story)
-    PivotalIntegration::Util::Git.should_receive(:merge)
-    PivotalIntegration::Util::Git.should_receive(:branch_name).and_return('master')
-    PivotalIntegration::Util::Git.should_receive(:push).with('master')
+    PivotalIntegration::Command::Configuration.any_instance.should_receive(:story).and_return(@story)
 
-    @finish.run nil
+    menu = double('menu')
+    menu.should_receive(:prompt=)
+    menu.should_receive(:choice).with('Username')
+
+    @assign.should_receive(:choose) { |&arg| arg.call menu }.and_return('Username')
+
+    memberships = double('memberships')
+    membership = double('membership')
+    @project.should_receive(:memberships).and_return(memberships)
+    memberships.should_receive(:all).and_return([membership])
+    membership.should_receive(:name).and_return('Username')
+    PivotalIntegration::Util::Story.should_receive(:assign).with(@story, 'Username')
+
+    @assign.run(nil)
   end
 end

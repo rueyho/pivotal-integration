@@ -13,14 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git-pivotal-tracker-integration/command/base'
-require 'git-pivotal-tracker-integration/command/command'
-require 'git-pivotal-tracker-integration/util/git'
-require 'git-pivotal-tracker-integration/util/story'
-require 'git-pivotal-tracker-integration/version-update/gradle'
+require_relative 'base'
+require_relative '../version-update/gradle'
 
 # The class that encapsulates releasing a Pivotal Tracker Story
-class GitPivotalTrackerIntegration::Command::Release < GitPivotalTrackerIntegration::Command::Base
+class PivotalIntegration::Command::Release < PivotalIntegration::Command::Base
+  desc "Create a release for a story"
 
   # Releases a Pivotal Tracker story by doing the following steps:
   # * Update the version to the release version
@@ -34,11 +32,11 @@ class GitPivotalTrackerIntegration::Command::Release < GitPivotalTrackerIntegrat
   #   * +nil+
   # @return [void]
   def run(filter)
-    story = GitPivotalTrackerIntegration::Util::Story.select_story(@project, filter.nil? ? 'release' : filter, 1)
-    GitPivotalTrackerIntegration::Util::Story.pretty_print story
+    story = PivotalIntegration::Util::Story.select_story(@project, filter.nil? ? 'release' : filter, 1)
+    PivotalIntegration::Util::Story.pretty_print story
 
     updater = [
-      GitPivotalTrackerIntegration::VersionUpdate::Gradle.new(@repository_root)
+      PivotalIntegration::VersionUpdate::Gradle.new(@repository_root)
     ].find { |candidate| candidate.supports? }
 
     current_version = updater.current_version
@@ -46,11 +44,11 @@ class GitPivotalTrackerIntegration::Command::Release < GitPivotalTrackerIntegrat
     next_version = ask("Enter next development version (current: #{current_version}): ")
 
     updater.update_version release_version
-    GitPivotalTrackerIntegration::Util::Git.create_release_tag release_version, story
+    PivotalIntegration::Util::Git.create_release_tag release_version, story
     updater.update_version next_version
-    GitPivotalTrackerIntegration::Util::Git.create_commit "#{next_version} Development", story
+    PivotalIntegration::Util::Git.create_commit "#{next_version} Development", story
 
-    GitPivotalTrackerIntegration::Util::Git.push GitPivotalTrackerIntegration::Util::Git.branch_name, "v#{release_version}"
+    PivotalIntegration::Util::Git.push PivotalIntegration::Util::Git.branch_name, "v#{release_version}"
   end
 
 end

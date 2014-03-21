@@ -18,18 +18,18 @@ require 'git-pivotal-tracker-integration/command/base'
 require 'git-pivotal-tracker-integration/command/configuration'
 require 'git-pivotal-tracker-integration/util/git'
 
-describe GitPivotalTrackerIntegration::Command::Base do
+describe PivotalIntegration::Command::Base do
 
   before do
     $stdout = StringIO.new
     $stderr = StringIO.new
 
     @project = double('project')
-    GitPivotalTrackerIntegration::Util::Git.should_receive(:repository_root)
-    GitPivotalTrackerIntegration::Command::Configuration.any_instance.should_receive(:api_token)
-    GitPivotalTrackerIntegration::Command::Configuration.any_instance.should_receive(:project_id)
+    PivotalIntegration::Util::Git.should_receive(:repository_root)
+    PivotalIntegration::Command::Configuration.any_instance.should_receive(:api_token)
+    PivotalIntegration::Command::Configuration.any_instance.should_receive(:project_id)
     PivotalTracker::Project.should_receive(:find).and_return(@project)
-    @base = GitPivotalTrackerIntegration::Command::Base.new
+    @base = PivotalIntegration::Command::Base.new
   end
 
   it 'should not run' do

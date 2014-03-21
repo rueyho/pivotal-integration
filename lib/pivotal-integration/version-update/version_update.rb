@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The root module for the project
-module GitPivotalTrackerIntegration
+require_relative '../../pivotal_integration'
+
+# A module encapsulating version update implementations
+module PivotalIntegration::VersionUpdate
 end

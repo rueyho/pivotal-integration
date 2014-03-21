@@ -13,14 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'git-pivotal-tracker-integration/command/base'
-require 'git-pivotal-tracker-integration/command/command'
-require 'git-pivotal-tracker-integration/util/git'
-require 'git-pivotal-tracker-integration/util/story'
+require_relative 'base'
 require 'pivotal-tracker'
 
 # The class that encapsulates starting a Pivotal Tracker Story
-class GitPivotalTrackerIntegration::Command::Start < GitPivotalTrackerIntegration::Command::Base
+class PivotalIntegration::Command::Start < PivotalIntegration::Command::Base
+  desc "Start working on a story"
 
   # Starts a Pivotal Tracker story by doing the following steps:
   # * Create a branch
@@ -33,16 +31,29 @@ class GitPivotalTrackerIntegration::Command::Start < GitPivotalTrackerIntegratio
   #   * a story type (feature, bug, chore)
   #   * +nil+
   # @return [void]
-  def run(filter)
-    story = GitPivotalTrackerIntegration::Util::Story.select_story @project, filter
+  def run(*arguments)
+    filter = arguments.first
+    use_current_branch = arguments.delete('--use-current')
 
-    GitPivotalTrackerIntegration::Util::Story.pretty_print story
+    if filter == 'new'
+      arguments.shift
+      story = PivotalIntegration::Util::Story.new(@project, *PivotalIntegration::Command::New.collect_type_and_name(arguments))
+    else
+      story = PivotalIntegration::Util::Story.select_story @project, filter
+    end
+
+    if story.estimate.nil? or story.estimate == -1
+      PivotalIntegration::Util::Story.estimate(story, PivotalIntegration::Command::Estimate.collect_estimation(@project))
+    end
+
+    PivotalIntegration::Util::Story.pretty_print story
 
     development_branch_name = development_branch_name story
-    GitPivotalTrackerIntegration::Util::Git.create_branch development_branch_name
+    PivotalIntegration::Util::Git.switch_branch 'master' unless use_current_branch
+    PivotalIntegration::Util::Git.create_branch development_branch_name
     @configuration.story = story
 
-    GitPivotalTrackerIntegration::Util::Git.add_hook 'prepare-commit-msg', File.join(File.dirname(__FILE__), 'prepare-commit-msg.sh')
+    PivotalIntegration::Util::Git.add_hook 'prepare-commit-msg', File.join(File.dirname(__FILE__), 'prepare-commit-msg.sh')
 
     start_on_tracker story
   end
@@ -50,16 +61,20 @@ class GitPivotalTrackerIntegration::Command::Start < GitPivotalTrackerIntegratio
   private
 
   def development_branch_name(story)
-    branch_name = "#{story.id}-" + ask("Enter branch name (#{story.id}-<branch-name>): ")
+    branch_name = branch_prefix(story) + ask("Enter branch name (#{branch_prefix(story)}<branch-name>): ")
     puts
     branch_name
+  end
+
+  def branch_prefix(story)
+    "#{story.id}-"
   end
 
   def start_on_tracker(story)
     print 'Starting story on Pivotal Tracker... '
     story.update(
       :current_state => 'started',
-      :owned_by => GitPivotalTrackerIntegration::Util::Git.get_config('user.name')
+      :owned_by => PivotalIntegration::Util::Git.get_config('user.name')
     )
     puts 'OK'
   end

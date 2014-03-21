@@ -14,13 +14,13 @@
 # limitations under the License.
 
 Gem::Specification.new do |s|
-  s.name        = 'git-pivotal-tracker-integration'
-  s.version     = '1.5.0.dev'
+  s.name        = 'pivotal-integration'
+  s.version     = '1.6.0'
   s.summary     = 'Git commands for integration with Pivotal Tracker'
   s.description = 'Provides a set of additional Git commands to help developers when working with Pivotal Tracker'
-  s.authors     = ['Ben Hale']
+  s.authors     = ['Ben Hale', 'Daniel Vandersluis']
   s.email       = 'nebhale@nebhale.com'
-  s.homepage    = 'https://github.com/nebhale/git-pivotal-tracker-integration'
+  s.homepage    = 'https://github.com/dvandersluis/pivotal-integration'
   s.license     = 'Apache-2.0'
 
   s.files            = %w(LICENSE NOTICE README.md) + Dir['lib/**/*.rb'] + Dir['lib/**/*.sh'] + Dir['bin/*']
@@ -29,7 +29,9 @@ Gem::Specification.new do |s|
 
   s.required_ruby_version = '>= 1.8.7'
 
+  s.add_dependency 'active_support'
   s.add_dependency 'highline', '~> 1.6'
+  s.add_dependency 'launchy'
   s.add_dependency 'pivotal-tracker', '~> 0.5'
 
   s.add_development_dependency 'bundler', '~> 1.3'
