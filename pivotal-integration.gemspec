@@ -15,7 +15,7 @@
 
 Gem::Specification.new do |s|
   s.name        = 'pivotal-integration'
-  s.version     = '1.6.0'
+  s.version     = '1.6.0.1'
   s.summary     = 'Git commands for integration with Pivotal Tracker'
   s.description = 'Provides a set of additional Git commands to help developers when working with Pivotal Tracker'
   s.authors     = ['Ben Hale', 'Daniel Vandersluis']

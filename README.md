@@ -1,11 +1,5 @@
 # Git Pivotal Tracker Integration
-[![Build Status](https://travis-ci.org/nebhale/git-pivotal-tracker-integration.png?branch=master)](https://travis-ci.org/nebhale/git-pivotal-tracker-integration)
-[![Gem Version](https://badge.fury.io/rb/git-pivotal-tracker-integration.png)](http://badge.fury.io/rb/git-pivotal-tracker-integration)
-[![Dependency Status](https://gemnasium.com/nebhale/git-pivotal-tracker-integration.png)](http://gemnasium.com/nebhale/git-pivotal-tracker-integration)
-[![Code Climate](https://codeclimate.com/github/nebhale/git-pivotal-tracker-integration.png)](https://codeclimate.com/github/nebhale/git-pivotal-tracker-integration)
-
-
-`pivotal-integration` provides a set of additional Git commands to help developers when working with [Pivotal Tracker][pivotal-tracker].
+`pivotal-integration` provides a set of additional Git commands to help developers when working with [Pivotal Tracker][pivotal-tracker]. It is based on and extended from [https://github.com/nebhale/git-pivotal-tracker-integration](https://github.com/nebhale/git-pivotal-tracker-integration) by Ben Hale.
 
 [pivotal-tracker]: http://www.pivotaltracker.com
 
