@@ -22,11 +22,11 @@ $ gem install pivotal-integration
 `pivotal-integration` is intended to be a very lightweight tool, meaning that it won't affect your day to day workflow very much.  To be more specific, it is intended to automate branch creation and destruction as well as story state changes, but will not affect when you commit, when development branches are pushed to origin, etc.  The typical workflow looks something like the following:
 
 ```plain
-$ git start       # Creates branch and starts story
+$ pivotal start       # Creates branch and starts story
 $ git commit ...
-$ git commit ...  # Your existing development process
+$ git commit ...      # Your existing development process
 $ git commit ...
-$ git finish      # Merges and destroys branch, pushes to origin, and finishes story
+$ pivotal finish      # Merges and destroys branch, pushes to origin, and finishes story
 ```
 
 
@@ -51,17 +51,17 @@ In order to take advantage of automatic issue completion, the [Pivotal Tracker S
 
 ## Commands
 
-### `git start [ type | story-id ]`
-This command starts a story by creating a Git branch and changing the story's state to `started`.  This command can be run in three ways.  First it can be run specifying the id of the story that you want to start.
+### `pivotal start [new] [ type | story-id ]`
+This command starts a story by creating a Git branch and changing the story's state to `started`.  This command can be run in four ways.  First it can be run specifying the id of the story that you want to start.
 
 ```plain
-$ git start 12345678
+$ pivotal start 12345678
 ```
 
-The second way to run the command is by specyifying the type of story that you would like to start.  In this case it will then offer you the first five stories (based on the backlog's order) of that type to choose from.
+The second way to run the command is by specifying the type of story that you would like to start.  In this case it will then offer you the first five stories (based on the backlog's order) of that type to choose from.
 
 ```plain
-$ git start feature
+$ pivotal start feature
 
 1. Lorem ipsum dolor sit amet, consectetur adipiscing elit
 2. Pellentesque sit amet ante eu tortor rutrum pharetra
@@ -71,10 +71,23 @@ $ git start feature
 Choose story to start:
 ```
 
+The third way to run the command lets you create a new story straight from the command line. You can specify which type of story you'd like to create in the command, or you will be prompted to choose. The story name and estimate is also specified. The new story will then be assigned and started.
+
+```plain
+$ pivotal start new
+1. Feature
+2. Bug
+3. Chore
+4. Release
+What type of story do you want to create: 
+Provide a name for the new story:
+Choose an estimation for this story [0, 1, 2, 3, enter for none]: 
+```
+
 Finally the command can be run without specifying anything.  In this case, it will then offer the first five stories (based on the backlog's order) of any type to choose from.
 
 ```plain
-$ git start
+$ pivotal start
 
 1. FEATURE Donec convallis leo mi, dictum ornare sem
 2. CHORE   Sed et magna lectus, sed auctor purus
@@ -84,10 +97,10 @@ $ git start
 Choose story to start:
 ```
 
-Once a story has been selected by one of the three methods, the command then prompts for the name of the branch to create.
+Once a story has been selected by one of the methods, the command then prompts for the name of the branch to create.
 
 ```plain
-$ git start 12345678
+$ pivotal start 12345678
         Title: Lorem ipsum dolor sit amet, consectetur adipiscing elitattributes
   Description: Ut consequat sapien ut erat volutpat egestas. Integer venenatis lacinia facilisis.
 
@@ -111,11 +124,25 @@ If it doesn't exist already, a `prepare-commit-msg` commit hook is added to your
 #
 ```
 
-### `git finish [--no-complete]`
+### `pivotal finish [--no-complete] [--pull-request] [--no-merge]`
+This command finishes a story. There are two workflows that can be used for finishing (pull requests and merging).
+
+#### Pull Request Workflow
+The pull request workflow can be accessed by specifying the `--pull-request` option, or by setting `pivotal.finish-mode` to `pull_request` in your git config. When using the PR workflow, when finishing a story, the branch will be pushed to the `origin` remote, and PR will be started (either launched in a web browser, or through the console using [hub](https://github.com/github/hub)). The behaviour can be specified by setting `pivotal.pull-request-editor` to `web` or `hub` in your git config.
+
+In both cases, the story will also be updated to mark its status as Finished.
+
+```plain
+$ pivotal finish --pull-request
+Pushing to origin... OK
+Changing state to finished
+```
+
+#### Merge Workflow
 This command finishes a story by merging and cleaning up its branch and then pushing the changes to a remote server.  This command can be run in two ways.  First it can be run without the `--no-complete` option.
 
 ```plain
-$ git finish
+$ pivotal finish
 Checking for trivial merge from 12345678-lorem-ipsum to master... OK
 Merging 12345678-lorem-ipsum to master... OK
 Deleting 12345678-lorem-ipsum... OK
@@ -146,23 +173,23 @@ Merge 12345678-lorem-ipsum to master
 
 After merging, the development branch is deleted and the changes are pushed to the remote repository.
 
-### `git release [story-id]`
+### `pivotal release [story-id]`
 This command creates a release for a story.  It does this by updating the version string in the project and creating a tag.  This command can be run in two ways.  First it can be run specifying the release that you want to create.
 
 ```plain
-$ git release 12345678
+$ pivotal release 12345678
 ```
 The other way the command can be run without specifying anything.  In this case, it will select the first release story (based on the backlog's order).
 
 ```plain
-$ git release
+$ pivotal release
       Title: Lorem ipsum dolor sit amet, consectetur adipiscing elitattributes
 ```
 
 Once a story has been selected by one of the two methods, the command then prompts for the release version and next development version.
 
 ```plain
-$ git release
+$ pivotal release
       Title: Lorem ipsum dolor sit amet, consectetur adipiscing elitattributes
 
 Enter release version (current: 1.0.0.BUILD-SNAPSHOT): 1.0.0.M1
@@ -175,4 +202,130 @@ Once these have been entered, the version string for the current project is upda
 
 Version update is currently supported for the following kinds of projects.  If you do not see a project type that you would like supported, please open an issue or submit a pull request.
 
-* Gradle
+### `pivotal new [type] [name]` 
+This command lets you create a new story in Pivotal Tracker directly from the command line. The story type and name can be provided as command line options or from prompts. Creating a story in this way adds it to the Icebox, and does not assign or start the story (contrasted to `pivotal start new`).
+
+```plain
+$ pivotal new feature "Create a blog"
+```
+
+```plain
+pivotal new
+1. Feature
+2. Bug
+3. Chore
+4. Release
+What type of story do you want to create: 
+Provide a name for the new story: 
+```
+
+### `pivotal info`
+This command gives you an output of info from the current story (including description, notes, etc.).
+
+```plain
+$ pivotal info
+         ID: 123456
+    Project: My Project
+      Title: Create a blog
+       Type: Feature
+      State: Started
+   Estimate: 3
+     Note 1: How many posts do we want to limit the blog to?
+```
+
+### `pivotal estimate [points]`
+This command lets you set or change the estimate for the current story. This command can be run in two ways. First it can be run by specifying the score you want to assign.
+
+```plain
+$ pivotal estimate 3
+```
+
+The second way is to run the command with specifying anything. In this case, the current estimate will be shown, as well as all the possible values (as set up for the project in Pivotal Tracker). In this mode, you can also choose to remove the estimate by leaving the score prompt blank.
+
+```plain
+$ pivotal estimate
+Story is currently estimated 3.
+Choose an estimation for this story [0, 1, 2, 3, enter for none]:
+```
+
+### `pivotal switch ID`
+This command lets you switch the active Pivotal Tracker story to a different one.
+
+```plain
+$ pivotal switch 12345678
+```
+
+### `pivotal assign [username]`
+This command assigns current story to another member of Pivotal Tracker project.  This command can be run in two ways.  First it can be run with specific username of project's member. If username consists of more than one world use braces as in example.
+
+```plain
+$ pivotal assign 'Mark Twain'
+```
+
+The other way the command can be run without specifying anything.  In this case, you will be able to choose from all project members.
+
+```plain
+$ pivotal assign
+
+1. Mark Twain
+2. Edgar Alan Poe
+Choose an user from above list:
+```
+
+### `pivotal label [mode] label1 ... labeln`
+This command manages story labels, there are four modes you can use:
+* add - appends new labels to story
+* once - appends new labels to story and removes it's occurences from every other story in project
+* remove - removes labels from story
+* list - lists labels attached to current story
+
+```plain
+$ pivotal label list
+```
+
+You have to specify mode and at least on label if you are using add, once or remove modes.
+
+```plain
+$ pivotal label add on_qa
+```
+
+### `pivotal mark [state]`
+This command marks current story with specified state. You can add desired state as follows:
+
+```plain
+$ pivotal mark finished
+```
+
+The other way the command can be run without specifying anything.  In this case, you will be able to choose from all possible states.
+
+```plain
+$ pivotal mark
+
+1. unstarted
+2. started
+3. finished
+4. delivered
+5. rejected
+6. accepted
+Choose story state from above list:
+```
+
+### `pivotal comment TEXT`
+This command allows you to add a comment (note) to the current story. The comment text must be given with the command.
+
+```plain
+$ pivotal comment "Good idea!"
+```
+
+### `pivotal open [project]`
+This command lets you open the current story or project in a web browser (this functionality is provided by [launchy](https://github.com/copiousfreetime/launchy) and may not work in all environments). There are two ways the command can be run in. First, if you want to open the current story directly.
+
+```plain
+$ pivotal open
+```
+
+Second, if you want to open the entire project
+
+```plain
+$ pivotal open project
+```
