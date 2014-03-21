@@ -1,5 +1,5 @@
 # Git Pivotal Tracker Integration
-`pivotal-integration` provides a set of additional Git commands to help developers when working with [Pivotal Tracker][pivotal-tracker]. It is based on and extended from [https://github.com/nebhale/git-pivotal-tracker-integration](https://github.com/nebhale/git-pivotal-tracker-integration) by Ben Hale.
+`pivotal-integration` provides a set of additional Git commands to help developers when working with [Pivotal Tracker][pivotal-tracker]. It is based on and extended from [git-pivotal-tracker-integration](https://github.com/nebhale/git-pivotal-tracker-integration) by Ben Hale.
 
 [pivotal-tracker]: http://www.pivotaltracker.com
 
