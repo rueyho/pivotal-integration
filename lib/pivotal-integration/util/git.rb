@@ -176,7 +176,7 @@ class PivotalIntegration::Util::Git
       when :web
         # Open the PR editor in a web browser
         repo = get_config('remote.origin.url')[/(?<=git@github.com:)[a-z0-9_-]+\/[a-z0-9_-]+/]
-        title = CGI::escape("#{story.name} [##{story.id}]")
+        title = CGI::escape("[##{story.id}] #{story.name}]")
         Launchy.open "https://github.com/#{repo}/compare/#{branch_name}?expand=1&pull_request[title]=#{title}"
 
       else

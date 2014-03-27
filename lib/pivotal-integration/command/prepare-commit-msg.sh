@@ -21,6 +21,6 @@ if [[ $2 != "commit" && -n $STORY_ID ]]; then
 	ORIG_MSG_FILE="$1"
 	TEMP=$(mktemp /tmp/git-XXXXX)
 
-	(printf "\n\n[#$STORY_ID] " ; cat "$1") > "$TEMP"
+  (cat "$1" ; printf "\n\n[#$STORY_ID]") > "$TEMP"
 	cat "$TEMP" > "$ORIG_MSG_FILE"
 fi

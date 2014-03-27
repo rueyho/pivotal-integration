@@ -27,10 +27,10 @@ class PivotalIntegration::Command::Finish < PivotalIntegration::Command::Base
   #
   # @return [void]
   def run(*arguments)
-    no_complete = arguments.delete('--no-complete')
-    no_delete = arguments.delete('--no-delete')
-    no_merge = arguments.delete('--no-merge')
-    pull_request = arguments.delete('--pull-request') || PivotalIntegration::Util::Git.finish_mode == :pull_request
+    no_complete = @options.fetch(:no_complete, false)
+    no_delete = @options.fetch(:no_delete, false)
+    no_merge = @options.fetch(:no_merge, false)
+    pull_request = @options.fetch(:pull_request, false) || PivotalIntegration::Util::Git.finish_mode == :pull_request
 
     if pull_request
       PivotalIntegration::Util::Git.push PivotalIntegration::Util::Git.branch_name

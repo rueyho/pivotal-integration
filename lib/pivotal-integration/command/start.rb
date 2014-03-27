@@ -33,7 +33,7 @@ class PivotalIntegration::Command::Start < PivotalIntegration::Command::Base
   # @return [void]
   def run(*arguments)
     filter = arguments.first
-    use_current_branch = arguments.delete('--use-current')
+    use_current_branch = @options.fetch(:use_current, false)
 
     if filter == 'new'
       arguments.shift

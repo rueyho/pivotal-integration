@@ -33,7 +33,7 @@ def print_command_help(commands)
 end
 
 def show_help
-  puts "Usage: git pivotal [--help] <command> [<args>]"
+  puts "Usage: pivotal [--help] <command> [<args>]"
   puts
 
   main_commands = COMMANDS.select{ |c| %w(start finish new).include? c.name.demodulize.downcase }
@@ -48,21 +48,46 @@ def show_help
 end
 
 begin
-  options = {}
-  optparse = OptionParser.new do |opts|
-    opts.on('-h', '--help') do
-      show_help
-      exit
-    end
-
-    opts.on('-S', '--story ID') do |id|
-      options[:story_id] = id
-    end
-  end
-  optparse.parse!
-
   if COMMAND_NAMES.include?(ARGV.first.try(:downcase))
-    command = ARGV.shift
+    command = ARGV.shift.downcase
+
+    options = {}
+    optparse = OptionParser.new do |opts|
+      opts.on('-h', '--help') do
+        show_help
+        exit
+      end
+
+      opts.on('-S', '--story ID') do |id|
+        options[:story_id] = id
+      end
+
+      if command == 'start'
+        opts.on('--use-current') do
+          options[:use_current] = true
+        end
+      end
+
+      if command == 'finish'
+        opts.on('--pull-request') do
+          options[:pull_request] = true
+        end
+
+        opts.on('--no-complete') do
+          options[:no_complete] = true
+        end
+
+        opts.on('--no-delete') do
+          options[:no_delete] = true
+        end
+
+        opts.on('--no-merge') do
+          options[:no_merge] = true
+        end
+      end
+    end
+    optparse.parse!
+
     command_class = PivotalIntegration::Command.const_get(command.classify)
     command_class.new(options).run(*ARGV)
 
