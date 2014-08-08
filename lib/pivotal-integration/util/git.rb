@@ -171,13 +171,22 @@ class PivotalIntegration::Util::Git
     end
   end
 
-  def self.create_pull_request(story)
+  def self.create_pull_request(story, to_branch = nil)
     case get_config_with_default('pivotal.pull-request-editor', :web).to_sym
       when :web
         # Open the PR editor in a web browser
         repo = get_config('remote.origin.url')[/(?<=git@github.com:)[a-z0-9_-]+\/[a-z0-9_-]+/]
-        title = CGI::escape("[##{story.id}] #{story.name}]")
-        Launchy.open "https://github.com/#{repo}/compare/#{branch_name}?expand=1&pull_request[title]=#{title}"
+        title = CGI::escape("[##{story.id}] #{story.name}")
+
+        url = "https://github.com/#{repo}/compare/"
+
+        if to_branch
+          upstream = get_config('remote.upstream.url')[/(?<=git@github.com:)[a-z0-9_-]+/]
+          url << "#{upstream}:#{to_branch}..."
+        end
+
+        url << "#{branch_name}?expand=1&pull_request[title]=#{title}"
+        Launchy.open url
 
       else
         print 'Checking for hub installation... '

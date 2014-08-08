@@ -33,8 +33,11 @@ class PivotalIntegration::Command::Finish < PivotalIntegration::Command::Base
     pull_request = @options.fetch(:pull_request, false) || PivotalIntegration::Util::Git.finish_mode == :pull_request
 
     if pull_request
+      root_branch = PivotalIntegration::Util::Git.get_config('root-branch', :branch)
+      root_branch = nil if root_branch == 'master'
+
       PivotalIntegration::Util::Git.push PivotalIntegration::Util::Git.branch_name
-      PivotalIntegration::Util::Git.create_pull_request(@configuration.story)
+      PivotalIntegration::Util::Git.create_pull_request(@configuration.story, root_branch)
       PivotalIntegration::Util::Story.mark(@configuration.story, :finished)
       return
     end
