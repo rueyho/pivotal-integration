@@ -91,7 +91,7 @@ begin
     command_class = PivotalIntegration::Command.const_get(command.classify)
     command_class.new(options).run(*ARGV)
 
-  elsif ARGV.empty?
+  elsif ARGV.empty? || ARGV.first == 'help'
     show_help
 
   else
