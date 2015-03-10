@@ -15,5 +15,5 @@
 
 # The root module for the project
 module PivotalIntegration
-  VERSION = '1.6.0.3'
+  VERSION = '1.6.0.4'
 end
