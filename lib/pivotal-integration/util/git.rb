@@ -175,17 +175,17 @@ class PivotalIntegration::Util::Git
     case get_config_with_default('pivotal.pull-request-editor', :web).to_sym
       when :web
         # Open the PR editor in a web browser
-        repo = get_config('remote.origin.url')[/(?<=git@github.com:)[a-z0-9_-]+\/[a-z0-9_-]+/]
+        repo = get_config('remote.upstream.url')[/(?<=git@github.com:)[a-z0-9_-]+\/[a-z0-9_-]+/]
         title = CGI::escape("[##{story.id}] #{story.name}")
 
+        origin = get_config('remote.origin.url')[/(?<=git@github.com:)[a-z0-9_-]+/]
         url = "https://github.com/#{repo}/compare/"
 
         if to_branch
-          upstream = get_config('remote.upstream.url')[/(?<=git@github.com:)[a-z0-9_-]+/]
-          url << "#{upstream}:#{to_branch}..."
+          url << "#{to_branch}..."
         end
 
-        url << "#{branch_name}?expand=1&pull_request[title]=#{title}"
+        url << "#{origin}:#{branch_name}?expand=1&pull_request[title]=#{title}"
         Launchy.open url
 
       else
